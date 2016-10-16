@@ -3,23 +3,25 @@
 
 python module stark ! in 
     interface  ! in :fandg
-        subroutine fandg(rv0,vv0,p,tau,nmax,rv,vv,t,integr) ! in :fandg:stark.f90
+        subroutine fandg(rv0,vv0,p,tau,nmax,alpha,rv,vv,t,integr) ! in :fandg:stark.f90
             real(kind=8) dimension(3),intent(in) :: rv0
             real(kind=8) dimension(3),intent(in) :: vv0
             real(kind=8) dimension(3),intent(in) :: p
             real(kind=8) intent(in) :: tau
             integer intent(in) :: nmax
+			real(kind=8) intent(in) :: alpha
             real(kind=8) dimension(3),intent(out) :: rv
             real(kind=8) dimension(3),intent(out) :: vv
             real(kind=8) intent(out) :: t
             real(kind=8) dimension(3,2),intent(out) :: integr
         end subroutine fandg
-        subroutine fandgex(rv0,vv0,p,tau,nmax,rv,vv,t,drvdtau,dvvdtau,dtdtau,drvdrv0,dvvdrv0,dtdrv0,drvdvv0,dvvdvv0,dtdvv0,drvdp,dvvdp,dtdp,integr) ! in :fandg:stark.f90
+        subroutine fandgex(rv0,vv0,p,tau,nmax,alpha,rv,vv,t,drvdtau,dvvdtau,dtdtau,drvdrv0,dvvdrv0,dtdrv0,drvdvv0,dvvdvv0,dtdvv0,drvdp,dvvdp,dtdp,integr) ! in :fandg:stark.f90
             real(kind=8) dimension(3),intent(in) :: rv0
             real(kind=8) dimension(3),intent(in) :: vv0
             real(kind=8) dimension(3),intent(in) :: p
             real(kind=8) intent(in) :: tau
             integer intent(in) :: nmax
+			real(kind=8) intent(in) :: alpha
             real(kind=8) dimension(3),intent(out) :: rv
             real(kind=8) dimension(3),intent(out) :: vv
             real(kind=8) intent(out) :: t

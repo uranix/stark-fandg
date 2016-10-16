@@ -42,6 +42,16 @@ subroutine evaldr0(rv0,vv0,pv,nmax,q,C,k,s0tau,alpha,shift,dadr0)
     end do
 end subroutine evaldr0
 
+subroutine vecmat(a, b, c)
+    implicit none
+    integer, parameter :: dp = kind(1.d0)
+    real(dp),intent(in) :: a(3), b(3, 3)
+    real(dp),intent(out) :: c(3)
+    c(1) = a(1)*b(1,1)+a(2)*b(2,1)+a(3)*b(3,1)
+    c(2) = a(1)*b(1,2)+a(2)*b(2,2)+a(3)*b(3,2)
+    c(3) = a(1)*b(1,3)+a(2)*b(2,3)+a(3)*b(3,3)
+end subroutine vecmat
+
 subroutine evaldv0(rv0,vv0,pv,nmax,C,k,s0tau,shift,dadv0)
     implicit none
     integer, parameter :: dp = kind(1.d0)
@@ -105,10 +115,10 @@ end function det3
 ! FG x 1
 ! eval x 7
 ! 7 x eval + 1 x coeff
-subroutine FandG(rv0, vv0, p, tau, nmax, rv, vv, t, integr)
+subroutine FandG(rv0, vv0, p, tau, nmax, alpha, rv, vv, t, integr)
     implicit none
     integer, parameter :: dp = kind(1.d0)
-    real(dp), parameter :: alpha = 1
+    real(dp), intent(in) :: alpha
     real(dp), intent(in) :: rv0(3), vv0(3), p(3), tau
     integer, intent(in) :: nmax
     real(dp) :: q,sigma,rho,omega,nu,theta,C(0:nmax, 4),r0,s0
@@ -133,7 +143,7 @@ subroutine FandG(rv0, vv0, p, tau, nmax, rv, vv, t, integr)
     s0 = r0**alpha
     s0tau = s0 * tau
 
-    call FG(nmax,q,sigma,rho,omega,nu,theta,C)
+    call FG(alpha,nmax,q,sigma,rho,omega,nu,theta,C)
 
     fr = eval(nmax,C,1,s0tau,0)
     gr = eval(nmax,C,2,s0tau,0)
@@ -189,7 +199,7 @@ end subroutine outer
 ! 28 x eval + 1 x ex. coeff
 !
 ! Approx. 4-5 times slower than FandG
-subroutine FandGex(rv0, vv0, p, tau, nmax, &
+subroutine FandGex(rv0, vv0, p, tau, nmax, alpha, &
         rv, vv, t, &
         drvdtau, dvvdtau, dtdtau, &
         drvdrv0, dvvdrv0, dtdrv0, &
@@ -197,7 +207,7 @@ subroutine FandGex(rv0, vv0, p, tau, nmax, &
         drvdp, dvvdp, dtdp, integr)
     implicit none
     integer, parameter :: dp = kind(1.d0)
-    real(dp), parameter :: alpha = 1
+    real(dp), intent(in) :: alpha
     real(dp), intent(in) :: rv0(3), vv0(3), p(3), tau
     integer, intent(in) :: nmax
     real(dp) :: q,sigma,rho,omega,nu,theta,C(0:nmax, 28),r0,s0
@@ -231,7 +241,7 @@ subroutine FandGex(rv0, vv0, p, tau, nmax, &
     s0 = r0**alpha
     s0tau = s0 * tau
 
-    call FGex(nmax,q,sigma,rho,omega,nu,theta,C)
+    call FGex(alpha,nmax,q,sigma,rho,omega,nu,theta,C)
 
     fr = eval(nmax,C,1,s0tau,0)
     gr = eval(nmax,C,2,s0tau,0)

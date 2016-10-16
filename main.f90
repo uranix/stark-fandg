@@ -1,8 +1,10 @@
 program test
     implicit none
     integer, parameter :: dp = kind(1.d0)
-    integer, parameter :: kmax = 15
+    integer, parameter :: kmax = 12
     real(dp) :: rv0(3),vv0(3),p(3),tau
+!    real(dp), parameter :: alpha = 1.5_dp
+    real(dp), parameter :: alpha = 2_dp
     real(dp) :: rv(3), vv(3), t
     real(dp) :: integr(3, 2)
     real(dp) :: rv1(3), vv1(3), t1, rv2(3), vv2(3), t2
@@ -16,12 +18,13 @@ program test
     vv0 = (/-1._dp, 1._dp, 2._dp/)
     p =   (/ 1._dp, 1._dp, 1._dp/)
 
+    write(*,*) 'alpha = ', alpha
     write(*,*) 'rv0 = ', rv0
     write(*,*) 'vv0 = ', vv0
     write(*,*) 'p = ', p
 
-    tau = 0.1_dp
-    call FandGex(rv0, vv0, p, tau, kmax, rv, vv, t, &
+    tau = 0.01_dp
+    call FandGex(rv0, vv0, p, tau, kmax, alpha, rv, vv, t, &
         drvdtau, dvvdtau, dtdtau, &
         drvdrv0, dvvdrv0, dtdrv0, &
         drvdvv0, dvvdvv0, dtdvv0, &
@@ -60,26 +63,26 @@ program test
     write(*,*) '         ', dvvdp(3, :)
 
     write(*,*) '====================== Numerical verification ======================='
-    call FandG(rv0, vv0, p, tau * (1 - delta), kmax, rv1, vv1, t1, integr)
-    call FandG(rv0, vv0, p, tau * (1 + delta), kmax, rv2, vv2, t2, integr)
+    call FandG(rv0, vv0, p, tau * (1 - delta), kmax, alpha, rv1, vv1, t1, integr)
+    call FandG(rv0, vv0, p, tau * (1 + delta), kmax, alpha, rv2, vv2, t2, integr)
     write(*,*) 'drvdtau ~ ', ((rv2-rv1) / (2*delta) - tau * drvdtau) / drvdtau
     write(*,*) 'dvvdtau ~ ', ((vv2-vv1) / (2*delta) - tau * dvvdtau) / dvvdtau
     write(*,*) 'dtdtau  ~ ', ((t2-t1) / (2*delta) - tau * dtdtau) / dtdtau
 
-    call FandG(rv0 - delta * dvec, vv0, p, tau, kmax, rv1, vv1, t1, integr)
-    call FandG(rv0 + delta * dvec, vv0, p, tau, kmax, rv2, vv2, t2, integr)
+    call FandG(rv0 - delta * dvec, vv0, p, tau, kmax, alpha, rv1, vv1, t1, integr)
+    call FandG(rv0 + delta * dvec, vv0, p, tau, kmax, alpha, rv2, vv2, t2, integr)
     write(*,*) 'drvdrv0 ~ ', ((rv2-rv1) / (2*delta) - matmul(drvdrv0, dvec)) / matmul(drvdrv0, dvec)
     write(*,*) 'dvvdrv0 ~ ', ((vv2-vv1) / (2*delta) - matmul(dvvdrv0, dvec)) / matmul(dvvdrv0, dvec)
     write(*,*) 'dtdrv0  ~ ', ((t2-t1) / (2*delta) - dot_product(dtdrv0, dvec)) / dot_product(dtdrv0, dvec)
 
-    call FandG(rv0, vv0 - delta * dvec, p, tau, kmax, rv1, vv1, t1, integr)
-    call FandG(rv0, vv0 + delta * dvec, p, tau, kmax, rv2, vv2, t2, integr)
+    call FandG(rv0, vv0 - delta * dvec, p, tau, kmax, alpha, rv1, vv1, t1, integr)
+    call FandG(rv0, vv0 + delta * dvec, p, tau, kmax, alpha, rv2, vv2, t2, integr)
     write(*,*) 'drvdvv0 ~ ', ((rv2-rv1) / (2*delta) - matmul(drvdvv0, dvec)) / matmul(drvdvv0, dvec)
     write(*,*) 'dvvdvv0 ~ ', ((vv2-vv1) / (2*delta) - matmul(dvvdvv0, dvec)) / matmul(dvvdvv0, dvec)
     write(*,*) 'dtdvv0  ~ ', ((t2-t1) / (2*delta) - dot_product(dtdvv0, dvec)) / dot_product(dtdvv0, dvec)
 
-    call FandG(rv0, vv0, p - delta * dvec, tau, kmax, rv1, vv1, t1, integr)
-    call FandG(rv0, vv0, p + delta * dvec, tau, kmax, rv2, vv2, t2, integr)
+    call FandG(rv0, vv0, p - delta * dvec, tau, kmax, alpha, rv1, vv1, t1, integr)
+    call FandG(rv0, vv0, p + delta * dvec, tau, kmax, alpha, rv2, vv2, t2, integr)
     write(*,*) 'drvdp   ~ ', ((rv2-rv1) / (2*delta) - matmul(drvdp, dvec)) / matmul(drvdp, dvec)
     write(*,*) 'dvvdp   ~ ', ((vv2-vv1) / (2*delta) - matmul(dvvdp, dvec)) / matmul(dvvdp, dvec)
     write(*,*) 'dtdp    ~ ', ((t2-t1) / (2*delta) - dot_product(dtdp, dvec)) / dot_product(dtdp, dvec)
